@@ -18,6 +18,7 @@
     in {
       packages = forAllSystems (pkgs: {
         default = pkgs.writeShellScriptBin "update-input" ''
+          set -euo pipefail
           input=$(                                           \
             nix flake metadata --json                        \
             | ${pkgs.jq}/bin/jq -r ".locks.nodes.root.inputs | keys[]" \
