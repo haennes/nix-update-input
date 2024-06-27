@@ -15,9 +15,7 @@
           "aarch64-darwin"
         ]
           (system: function nixpkgs.legacyPackages.${system});
-    in {
-      packages = forAllSystems (pkgs: {
-        default = pkgs.writeShellScriptBin "update-input" ''
+      script = pkgs: ''
           set -euo pipefail
           input=$(                                           \
             nix flake metadata --json                        \
@@ -31,6 +29,25 @@
             nix flake lock --update-input $input
           fi
         '';
+      _script_apply =
+      ''
+          while true; do
+              read -p "apply? " yn
+              case $yn in
+                  [Yy]* ) sudo nixos-rebuild switch --flake .#; break;;
+                  [Nn]* ) exit;;
+                  * ) echo "Please answer yes or no.";;
+              esac
+          done
+      '';
+      script_apply = pkgs: (nixpkgs.lib.concatLines [
+      (script pkgs)
+      _script_apply
+      ]);
+    in {
+      packages = forAllSystems (pkgs: {
+        default = pkgs.writeShellScriptBin "update-input" script;
+        update-apply = pkgs.writeShellScriptBin "update-apply" (script_apply pkgs);
       });
     };
 }
