@@ -44,10 +44,25 @@
       (script pkgs)
       _script_apply
       ]);
+      script_apply_cycle = pkgs: (nixpkgs.lib.concatLines [
+      ''while true; do''
+        (script pkgs)
+        _script_apply
+      ''
+        read -p "continue?" cont
+        case $cont in
+          [Yy]* ) ;;
+          [Nn]* ) exit;;
+          * ) echo "Please answer yes or no.";;
+        esac
+      done
+      ''
+      ]);
     in {
       packages = forAllSystems (pkgs: {
-        default = pkgs.writeShellScriptBin "update-input" script;
+        default = pkgs.writeShellScriptBin "update-input" (script pkgs);
         update-apply = pkgs.writeShellScriptBin "update-apply" (script_apply pkgs);
+        update-apply-cycle = pkgs.writeShellScriptBin "update-apply-cycle" (script_apply_cycle pkgs);
       });
     };
 }
