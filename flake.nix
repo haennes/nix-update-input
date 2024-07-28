@@ -5,7 +5,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
-  outputs = { nixpkgs, ... }:
+  outputs = {self, nixpkgs, ... }:
     let
       forAllSystems = function:
         nixpkgs.lib.genAttrs [
@@ -59,6 +59,10 @@
       ''
       ]);
     in {
+      overlays.default = final: prev:
+      {
+      inherit (self.packages.x86_64-linux) update-apply-cycle;
+      };
       packages = forAllSystems (pkgs: {
         default = pkgs.writeShellScriptBin "update-input" (script pkgs);
         update-apply = pkgs.writeShellScriptBin "update-apply" (script_apply pkgs);
