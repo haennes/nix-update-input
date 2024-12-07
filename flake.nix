@@ -30,7 +30,7 @@
         while true; do
             read -p "apply? " yn
             case $yn in
-                [Yy]* ) sudo nixos-rebuild switch --flake .#; break;;
+                [Yy]* ) sudo nixos-rebuild switch --flake path://$(pwd)#; break;;
                 [Nn]* ) exit;;
                 * ) echo "Please answer yes or no.";;
             esac
