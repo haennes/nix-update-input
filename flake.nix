@@ -53,7 +53,7 @@
             done
           ''
         ]);
-    in {
+    in rec {
       overlays.default = final: prev: {
         inherit (self.packages.x86_64-linux) update-apply-cycle;
       };
@@ -64,5 +64,7 @@
         update-apply-cycle = pkgs.writeShellScriptBin "update-apply-cycle"
           (script_apply_cycle pkgs);
       });
+
+      hydraJobs.packages = packages;
     };
 }
